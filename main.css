@@ -1,0 +1,45 @@
+
+.tooltip {
+    position: absolute;
+    visibility: hidden;
+    z-index: 100;
+    background-color: #d9f1ff;
+    border: 1px solid #b3e3ff;
+    padding: .5em;
+    font-family: sans-serif;
+
+}
+
+.tooltip .date {
+    font-size: 14pt;
+}
+
+.tooltip .description {
+    font-size: 10pt;
+}
+
+line.family-background {
+    stroke-width: 9px;
+    stroke: #fff;
+}
+
+line.family {
+    stroke-width: 1px;
+    stroke: #aaa;
+    shape-rendering: crispEdges;
+}
+
+circle {
+    fill: #46baff;
+    stroke: #2d79a6;
+}
+
+rect.today {
+    fill: #fff;
+    opacity: .5;
+}
+
+line.today {
+    stroke: #ccc;
+    shape-rendering: crispEdges;
+}
