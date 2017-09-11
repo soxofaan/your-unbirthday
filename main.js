@@ -111,6 +111,25 @@ function getNumberToDateConvertors(birthDate) {
     convertors['N months, N weeks and N days'] = getConvertor(0, 1, 1, 1);
     convertors['N weeks and N days'] = getConvertor(0, 0, 1, 1);
 
+    convertors['N years, N+1 months, N+2 days'] = function (x) {
+        return [
+            x + ' years, ' + (x + 1) + ', months and ' + (x + 2) + ' days',
+            (new XDate(birthDate)).addYears(x).addMonths(x + 1).addDays((x + 2))
+        ];
+    };
+    convertors['N years, N+1 months, N+2 weeks'] = function (x) {
+        return [
+            x + ' years, ' + (x + 1) + ', months and ' + (x + 2) + ' weeks',
+            (new XDate(birthDate)).addYears(x).addMonths(x + 1).addDays(7 * (x + 2))
+        ];
+    };
+    convertors['N years, N+1 months, N+2 weeks, N+3 days'] = function (x) {
+        return [
+            x + ' years, ' + (x + 1) + ', months ' + (x + 2) + ', weeks and ' + (x + 3) + ' days',
+            (new XDate(birthDate)).addYears(x).addMonths(x + 1).addDays(7 * (x + 2) + (x + 3))
+        ];
+    };
+
     return convertors;
 }
 
@@ -164,11 +183,10 @@ function main(domSelector) {
     var fromDate = new XDate().addMonths(-2);
     // var fromDate = new XDate(birthDay).addMonths(-2);
     // var toDate = new Date(2019, 1, 1);
-    var toDate = new XDate().addYears(2);
+    var toDate = new XDate().addYears(1);
     // var toDate = new XDate(birthDay).addYears(5);
 
     var dates = collectSpecialDays(birthDay, fromDate, toDate);
-    console.log(dates);
 
 
     var width = 960;
@@ -201,10 +219,7 @@ function main(domSelector) {
         .enter()
         .append('g')
         .attr('class', 'family')
-        .attr('transform', function (d) {
-            console.log(d);
-            return 'translate(0,' + yScale(d.key) + ")";
-        })
+        .attr('transform', function (d) { return 'translate(0,' + yScale(d.key) + ")"; })
     ;
     families.append('line')
         .attr('class', 'family-background')
