@@ -1,45 +1,94 @@
 
-.tooltip {
-    position: absolute;
-    visibility: hidden;
-    z-index: 100;
-    background-color: #d9f1ff;
-    border: 1px solid #b3e3ff;
-    padding: .5em;
-    font-family: sans-serif;
-
+body {
+    background-color: white;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #2b505b;
 }
 
-.tooltip .date {
-    font-size: 14pt;
+h1 {
+    font-family: 'Alegreya', serif;
+    font-size: 48px;
+    text-align: center;
 }
 
-.tooltip .description {
-    font-size: 10pt;
+div#container {
+    width: 800px;
+    margin: 0 auto;
 }
 
-line.family-background {
-    stroke-width: 9px;
-    stroke: #fff;
+.month-section {
+    border-top: 1px solid #cfe1e6;
+    padding: 1em 0;
+    clear: both;
 }
 
-line.family {
-    stroke-width: 1px;
-    stroke: #aaa;
-    shape-rendering: crispEdges;
+.month-label {
+    width: 200px;
+    display: inline-block;
+    vertical-align: top;
+    font-family: 'Alegreya', serif;
+    text-align: right;
 }
 
-circle {
-    fill: #46baff;
-    stroke: #2d79a6;
+.month-label .month {
+    font-weight: bold;
+    font-size: 32px;
+    line-height: 1;
+    margin-right: 10px;
 }
 
-rect.today {
-    fill: #fff;
-    opacity: .5;
+.month-label .year {
+    font-size: 18px;
+    line-height: 0.7;
+    margin-right: 10px;
 }
 
-line.today {
-    stroke: #ccc;
-    shape-rendering: crispEdges;
+.days {
+    width: 600px;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.birthday {
+    margin-bottom: 10px;
+}
+
+.birthday .date {
+    width: 80px;
+    display: inline-block;
+    vertical-align: top;
+    text-align: right;
+}
+
+.birthday .weekday {
+    font-size: 14px;
+    font-family: 'Alegreya', serif;
+    text-transform: uppercase;
+    letter-spacing: .2em;
+    width: 5em;
+    vertical-align: middle;
+}
+
+.birthday .day {
+    background: #2b505b;
+    color: white;
+    border-radius: 8px;
+    display: inline-block;
+    font-family: 'Oswald', sans-serif;
+    font-size: 16px;
+    width: 24px;
+    height: 24px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.birthday .description {
+    width: 500px;
+    margin-left: 10px;
+    font-family: 'Caveat', cursive;
+    font-size: 24px;
+    line-height: 1;
+    display: inline-block;
+    vertical-align: top;
 }
