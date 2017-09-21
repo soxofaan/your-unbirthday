@@ -51,7 +51,7 @@ div#container {
 }
 
 .birthday {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .birthday .date {
@@ -91,4 +91,38 @@ div#container {
     line-height: 1;
     display: inline-block;
     vertical-align: top;
+}
+
+@media only screen and (max-width: 800px) {
+
+    div#container {
+        width: auto;
+    }
+
+    .month-section {
+        margin: 0 10px;
+    }
+
+    .month-label {
+        display: block;
+        text-align: left;
+        margin-bottom: 10px;
+    }
+
+    .month-label div {
+        display: inline;
+    }
+
+    .days {
+        display: block;
+        width: auto;
+    }
+
+    .birthday .date {
+        width: 20%
+    }
+
+    .birthday .description {
+        width: 70%;
+    }
 }
