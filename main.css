@@ -4,15 +4,30 @@ body {
     font-size: 16px;
     line-height: 1.5;
     color: #2b505b;
+    font-family: 'Alegreya', serif;
 }
 
 h1 {
-    font-family: 'Alegreya', serif;
     font-size: 48px;
     text-align: center;
 }
 
-div#container {
+#date-select {
+    text-align: center;
+    margin: 20px;
+    font-size: 24px;
+}
+
+#date-form select {
+    font-size: 24px;
+    margin: 0 0.5ex;
+}
+
+#date-form button {
+    font-size: 24px;
+}
+
+div#calendar {
     width: 800px;
     margin: 0 auto;
 }
@@ -27,7 +42,6 @@ div#container {
     width: 200px;
     display: inline-block;
     vertical-align: top;
-    font-family: 'Alegreya', serif;
     text-align: right;
 }
 
@@ -63,7 +77,6 @@ div#container {
 
 .birthday .weekday {
     font-size: 14px;
-    font-family: 'Alegreya', serif;
     text-transform: uppercase;
     letter-spacing: .2em;
     width: 5em;
@@ -95,7 +108,7 @@ div#container {
 
 @media only screen and (max-width: 800px) {
 
-    div#container {
+    div#calendar {
         width: auto;
     }
 

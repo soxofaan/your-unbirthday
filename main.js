@@ -240,44 +240,70 @@ function collectSpecialDays(birthDate, fromDate, toDate) {
     return dates;
 }
 
+function setupForm() {
 
-function main(domSelector) {
+    var form = d3.select('#date-form').append('form');
+    var day = form.append('select');
+    day.selectAll('option')
+        .data(d3.range(1, 32))
+        .enter()
+        .append('option')
+        .attr('value', function (d) {return d;})
+        .text(function (d) {return d;});
 
-    var today = new Date();
-    var birthDay = new Date(1980, 1, 20);
-    // var birthDay = new Date(2005, 1, 20);
-    // var fromDate = new Date(2017, 07, 1);
+    var month = form.append('select');
+    month.selectAll('option')
+        .data(d3.range(0, 12))
+        .enter()
+        .append('option')
+        .attr('value', function (d) {return d;})
+        .text(function (d) {return (new XDate(2000, d, 1)).toString('MMMM');});
+    var year = form.append('select');
+    year.selectAll('option')
+        .data(d3.range((new Date()).getFullYear(), 1920, -1))
+        .enter()
+        .append('option')
+        .attr('value', function (d) {return d;})
+        .text(function (d) {return d;});
+
+    form.append('button')
+        .attr('type', 'button')
+        .on('click', function () {
+            var date = new Date(year.property('value'), month.property('value'), day.property('value'));
+            showDates(date)
+
+        })
+        .text('Go!');
+
+}
+
+function showDates(birthDay) {
     var fromDate = new XDate().addMonths(-1);
-    // var fromDate = new XDate(birthDay).addMonths(-2);
-    // var toDate = new Date(2019, 1, 1);
     var toDate = new XDate().addYears(1);
-    // var toDate = new XDate(birthDay).addYears(5);
 
     var dates = collectSpecialDays(birthDay, fromDate, toDate);
-
 
     dates = d3.entries(dates)
         .sort(function (a, b) { return d3.ascending(a.value, b.value);})
         .map(function (d) { return [d.key, d.value];});
-    console.log(dates);
 
     var byMonth = d3.nest()
         .key(function (d) { return d[1].toString('yyyy-MM') })
         .entries(dates)
     ;
 
+    var monthSections = d3.select('#calendar').selectAll('div.month-section')
+        .data(byMonth, function (d) {return d.key;});
 
-    console.log(byMonth);
+    monthSections.exit().remove();
 
-    var monthSections = d3.select(domSelector).selectAll('div.month-group')
-        .data(byMonth)
-        .enter()
+    var newMonthSections = monthSections.enter()
         .append('div')
         .attr('class', 'month-section')
     ;
 
     // Year+Month grouping label
-    monthSections
+    newMonthSections
         .append('div')
         .attr('class', 'month-label')
         .html(function (d) {
@@ -289,14 +315,20 @@ function main(domSelector) {
     ;
 
     // Birthdays
-    monthSections
+    newMonthSections
         .append('div')
-        .attr('class', 'days')
-        .selectAll('div.day')
-        .data(function (d) {return d.values;})
-        .enter()
+        .attr('class', 'days');
+
+    var days = newMonthSections.merge(monthSections)
+        .select('.days').selectAll('div.birthday')
+        .data(function (d) {return d.values;});
+
+    days.exit().remove();
+
+    days.enter()
         .append('div')
         .attr('class', 'birthday')
+        .merge(days)
         .html(function (d) {
             return (
                 '<div class="date"><span class="weekday">' + d[1].toString('ddd') + '</span> '
@@ -305,5 +337,10 @@ function main(domSelector) {
             );
         })
 
+}
+
+function main() {
+
+    setupForm();
 
 }
