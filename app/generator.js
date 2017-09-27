@@ -200,6 +200,8 @@ define(['lib/xdate'], function (XDate) {
     function collect(birthDate, fromDate, toDate) {
         var dates = {};
 
+        // TODO: guard against too low/high dates
+
         var dateConvertors = [
             'y', 'ym', 'ymw', 'ymwd', 'ymwdh',
             'ymd', 'ymdh',

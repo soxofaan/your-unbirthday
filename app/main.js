@@ -7,6 +7,6 @@ requirejs.config({
     }
 });
 
-require(['app/generator', 'app/ui'], function (generator, ui) {
-    ui.setupForm();
+require(['app/ui'], function (ui) {
+    ui.setup();
 });

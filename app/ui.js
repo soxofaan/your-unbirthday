@@ -1,6 +1,10 @@
 define(['lib/d3', 'lib/xdate', 'app/generator'], function (d3, XDate, generator) {
 
-    function setupForm() {
+    function setupForm(initialDate) {
+
+        var initialYear = initialDate.getFullYear();
+        var initialMonth = initialDate.getMonth();
+        var initialDay = initialDate.getDate();
 
         var form = d3.select('#date-form').append('form');
         var day = form.append('select');
@@ -9,7 +13,10 @@ define(['lib/d3', 'lib/xdate', 'app/generator'], function (d3, XDate, generator)
             .enter()
             .append('option')
             .attr('value', function (d) {return d;})
-            .text(function (d) {return d;});
+            .text(function (d) {return d;})
+            .filter(function (d) {return d === initialDay; })
+            .attr('selected', 'selected')
+        ;
 
         var month = form.append('select');
         month.selectAll('option')
@@ -17,19 +24,27 @@ define(['lib/d3', 'lib/xdate', 'app/generator'], function (d3, XDate, generator)
             .enter()
             .append('option')
             .attr('value', function (d) {return d;})
-            .text(function (d) {return (new XDate(2000, d, 1)).toString('MMMM');});
+            .text(function (d) {return (new XDate(2000, d, 1)).toString('MMMM');})
+            .filter(function (d) { return d === initialMonth; })
+            .attr('selected', 'selected')
+        ;
         var year = form.append('select');
         year.selectAll('option')
             .data(d3.range((new Date()).getFullYear(), 1920, -1))
             .enter()
             .append('option')
             .attr('value', function (d) {return d;})
-            .text(function (d) {return d;});
+            .text(function (d) {return d;})
+            .filter(function (d) { return d === initialYear; })
+            .attr('selected', 'selected')
+        ;
+
 
         form.append('button')
             .attr('type', 'button')
             .on('click', function () {
-                var date = new Date(year.property('value'), month.property('value'), day.property('value'));
+                var date = new XDate(year.property('value'), month.property('value'), day.property('value'));
+                window.location.hash = '#' + date.toString('yyyy-MM-dd');
                 showDates(date)
 
             })
@@ -99,8 +114,20 @@ define(['lib/d3', 'lib/xdate', 'app/generator'], function (d3, XDate, generator)
 
     }
 
+    function setup() {
+        // Get initial date from URL fragment.
+        var initialDate = new Date(window.location.hash);
+        if (isNaN(initialDate.getTime())) {
+            setupForm((new XDate()).addYears(-42));
+        }
+        else {
+            setupForm(initialDate);
+            showDates(initialDate);
+        }
+    }
+
     return {
-        setupForm: setupForm
+        setup: setup
     };
 
 
