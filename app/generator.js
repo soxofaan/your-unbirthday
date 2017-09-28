@@ -83,12 +83,13 @@ define(['lib/xdate'], function (XDate) {
             }
         }
 
-        // TODO: only do pi with at least 4 numbers
-        function pi(f) {
-            // Digits of pi
-            var digits = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]; //, 5, 8, 9, 7, 9, 3];
+        // Build number sequences from a fixed digit sequence
+        // e.g. pi: 3,14159265  ->  ... [31, 41, 592, 6, 5] ... [3, 14, 159, 26, 5] ...
+        function fromDigits(digits) {
+            // Implementation: recursively based on a state array that keeps track of the length (in digits)
+            // of each number in the sequence.
 
-            /// Convert state array to numbers from pi digits
+            /// Convert state array to numbers using the digits
             function stateToNumbers(state) {
                 // Convert state to slices.
                 var slices = state.reduce(function (a, v, i) {
@@ -108,23 +109,25 @@ define(['lib/xdate'], function (XDate) {
                 return state
             }
 
-            /// Apply state and recursively evaluate higher states
-            function pi_recurse(state, start_index) {
-                var total = state.reduce(function (a, v) {return a + v;}, 0);
-                if (total <= digits.length) {
+            return function (f) {
+                // TODO: make sure all numbers (or at least 4) are consumed
+                /// Apply state and recursively evaluate higher states
+                function recurse(state, start_index) {
                     var numbers = stateToNumbers(state);
-                    if (f.apply(null, numbers)) {
-                        // recurse
+                    var total = state.reduce(function (a, v) {return a + v;}, 0);
+                    // TODO: limit the difference in state values
+                    // Try the numbers: if it works and there is room to grow: try larger digit groups recursively
+                    if (f.apply(null, numbers) && total < digits.length) {
                         for (var i = start_index; i <= 4; i++) {
-                            pi_recurse(incr(state, i), i);
+                            recurse(incr(state, i), i);
                         }
                     }
                 }
-            }
 
-            pi_recurse([1, 1, 1, 1, 1], 0);
-
+                recurse([1, 1, 1, 1, 1], 0);
+            };
         }
+
 
         // 123, 123, 123
         // 1234, 1234, 1234
@@ -158,8 +161,12 @@ define(['lib/xdate'], function (XDate) {
             repeat(digitRepeat),
             // 'fibonnaci':
             // fibonnaci,
+
             // TODO: label number sequences for ui?
-            pi
+            fromDigits([3, 1, 4, 1, 5, 9, 2, 6, 5, 3]),  // From digits of pi
+
+            fromDigits([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]),
+            fromDigits([9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
         ];
 
         //
@@ -176,9 +183,8 @@ define(['lib/xdate'], function (XDate) {
         // ];
         // TODO: successive squares
         // TODO: succesive primes
-        // TODO: using successive digits, eg  12y 345m 6d
-        // TODO: partition of the 10 digits
         // TODO: doubling increase
+        // TODO: partition of the 10 digits
         // pi numbers: [3, 1, 4, 1, 5], [3, 14, 15, 92] ...
 
     }();
