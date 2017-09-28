@@ -108,6 +108,7 @@ define(['lib/xdate'], function (XDate) {
             // 'repeated one to hundred':
             repeat(oneToHundred),
             // 'one to hundred incrementing':
+            // TODO require that at least 3 values are used
             increase(oneToHundred),
             // 'one to hundred decrementing':
             decrease(oneToHundred),
@@ -120,7 +121,8 @@ define(['lib/xdate'], function (XDate) {
             // 'digit repeated':
             repeat(digitRepeat),
             // 'fibonnaci':
-            fibonnaci,
+            // fibonnaci,
+            // TODO: label number sequences for ui?
             pi
         ];
 
@@ -138,6 +140,8 @@ define(['lib/xdate'], function (XDate) {
         // ];
         // TODO: successive squares
         // TODO: succesive primes
+        // TODO: using successive digits, eg  12y 345m 6d
+        // TODO: partition of the 10 digits
         // TODO: doubling increase
         // pi numbers: [3, 1, 4, 1, 5], [3, 14, 15, 92] ...
 

@@ -111,6 +111,8 @@ define(['lib/d3', 'lib/xdate', 'app/generator'], function (d3, XDate, generator)
                     + '<span class="description">' + d[0] + '</span>'
                 );
             })
+        ;
+        // TODO: gray out past days
 
     }
 
