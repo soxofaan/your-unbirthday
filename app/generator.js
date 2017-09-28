@@ -83,11 +83,47 @@ define(['lib/xdate'], function (XDate) {
             }
         }
 
+        // TODO: only do pi with at least 4 numbers
         function pi(f) {
-            f(3, 1, 4, 1, 5);
-            f(3, 14, 15, 92, 65);
-            f(31, 41, 59, 26, 53);
-            // TODO: more
+            // Digits of pi
+            var digits = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]; //, 5, 8, 9, 7, 9, 3];
+
+            /// Convert state array to numbers from pi digits
+            function stateToNumbers(state) {
+                // Convert state to slices.
+                var slices = state.reduce(function (a, v, i) {
+                    return a.concat(i < 1 ? [[0, v]] : [[a[a.length - 1][1], a[a.length - 1][1] + v]]);
+                }, []);
+                // Slice digit array and turn into numbers
+                var numbers = slices.map(function (v) {
+                    return digits.slice.apply(digits, v).reduce(function (a, v) { return a * 10 + v;}, 0);
+                });
+                return numbers;
+            }
+
+            /// Copy state and increment at given index
+            function incr(state, i) {
+                state = state.slice();
+                state[i] += 1;
+                return state
+            }
+
+            /// Apply state and recursively evaluate higher states
+            function pi_recurse(state, start_index) {
+                var total = state.reduce(function (a, v) {return a + v;}, 0);
+                if (total <= digits.length) {
+                    var numbers = stateToNumbers(state);
+                    if (f.apply(null, numbers)) {
+                        // recurse
+                        for (var i = start_index; i <= 4; i++) {
+                            pi_recurse(incr(state, i), i);
+                        }
+                    }
+                }
+            }
+
+            pi_recurse([1, 1, 1, 1, 1], 0);
+
         }
 
         // 123, 123, 123
