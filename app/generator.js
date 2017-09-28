@@ -202,28 +202,38 @@ define(['lib/xdate'], function (XDate) {
             var x;
             if (/y/.test(code)) {
                 x = shift();
-                date.addYears(x);
-                nameParts.push(x + ' years');
+                if (x) {
+                    date.addYears(x);
+                    nameParts.push(x + ' year' + (x > 1 ? 's' : ''));
+                }
             }
             if (/m/.test(code)) {
                 x = shift();
-                date.addMonths(x);
-                nameParts.push(x + ' months');
+                if (x) {
+                    date.addMonths(x);
+                    nameParts.push(x + ' month' + (x > 1 ? 's' : ''));
+                }
             }
             if (/w/.test(code)) {
                 x = shift();
-                date.addDays(7 * x);
-                nameParts.push(x + ' weeks');
+                if (x) {
+                    date.addDays(7 * x);
+                    nameParts.push(x + ' week' + (x > 1 ? 's' : ''));
+                }
             }
             if (/d/.test(code)) {
                 x = shift();
-                date.addDays(x);
-                nameParts.push(x + ' days');
+                if (x) {
+                    date.addDays(x);
+                    nameParts.push(x + ' day' + (x > 1 ? 's' : ''));
+                }
             }
             if (/h/.test(code)) {
                 x = shift();
-                date.addHours(x);
-                nameParts.push(x + ' hours');
+                if (x) {
+                    date.addHours(x);
+                    nameParts.push(x + ' hour' + (x > 1 ? 's' : ''));
+                }
             }
             var name;
             if (nameParts.length > 1) {
