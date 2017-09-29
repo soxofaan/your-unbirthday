@@ -181,60 +181,46 @@ define(['lib/xdate'], function (XDate) {
         //         [12321, 1234321, 123454321, 12345654321].forEach(f)
         //     },
         // ];
+        // 123, 123, 123
+        // 1234, 1234, 1234
+        // 12345, 12345, 12345
+
+        // 123, 321, 123, 321, ...
+        // 1234, 4321, 1234, 4321, ...
+
         // TODO: successive squares
         // TODO: succesive primes
         // TODO: doubling increase
         // TODO: partition of the 10 digits
-        // pi numbers: [3, 1, 4, 1, 5], [3, 14, 15, 92] ...
 
     }();
 
     function buildDateConvertor(birthDate, code) {
         return function convertor() {
             var args = arguments;
-
-            function shift() {
-                return Array.prototype.shift.call(args);
-            }
-
-            var nameParts = [];
+            // Copy date to manipulate
             var date = new XDate(birthDate);
-            var x;
-            if (/y/.test(code)) {
-                x = shift();
-                if (x) {
-                    date.addYears(x);
-                    nameParts.push(x + ' year' + (x > 1 ? 's' : ''));
+            var nameParts = [];
+
+            [
+                [/c/, 'decade', function(x) {return date.addYears(10*x);}],
+                [/y/, 'year', date.addYears],
+                [/m/, 'month', date.addMonths],
+                [/w/, 'week', function (x) { return date.addDays(7 * x);}],
+                [/d/, 'day', date.addDays],
+                [/h/, 'hour', date.addHours]
+            ].forEach(function (period) {
+                // period[0]: regex
+                // period[1]: period name
+                // period[2]: date increment callback
+                if (period[0].test(code)) {
+                    var x = Array.prototype.shift.call(args);
+                    if (x) {
+                        period[2].call(date, x);
+                        nameParts.push(x + ' ' + period[1] + (x > 1 ? 's' : ''));
+                    }
                 }
-            }
-            if (/m/.test(code)) {
-                x = shift();
-                if (x) {
-                    date.addMonths(x);
-                    nameParts.push(x + ' month' + (x > 1 ? 's' : ''));
-                }
-            }
-            if (/w/.test(code)) {
-                x = shift();
-                if (x) {
-                    date.addDays(7 * x);
-                    nameParts.push(x + ' week' + (x > 1 ? 's' : ''));
-                }
-            }
-            if (/d/.test(code)) {
-                x = shift();
-                if (x) {
-                    date.addDays(x);
-                    nameParts.push(x + ' day' + (x > 1 ? 's' : ''));
-                }
-            }
-            if (/h/.test(code)) {
-                x = shift();
-                if (x) {
-                    date.addHours(x);
-                    nameParts.push(x + ' hour' + (x > 1 ? 's' : ''));
-                }
-            }
+            });
             var name;
             if (nameParts.length > 1) {
                 name = nameParts.slice(0, nameParts.length - 1).join(', ') + ' and ' + nameParts[nameParts.length - 1]
@@ -259,6 +245,7 @@ define(['lib/xdate'], function (XDate) {
         // TODO: guard against too low/high dates
 
         var dateConvertors = [
+            'c', 'cy', 'cym', 'cymw', 'cymwd',
             'y', 'ym', 'ymw', 'ymwd', 'ymwdh',
             'ymd', 'ymdh',
             'm', 'mw', 'mwd', 'mwdh',
