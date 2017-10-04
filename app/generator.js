@@ -76,6 +76,14 @@ define(['lib/xdate'], function (XDate) {
         }
     }
 
+    function increasingDigits(f) {
+        f(123) && f(1234) && f(12345) && f(123456) && f(1234567) && f(12345678) && f(123456789);
+    }
+
+    function decreasingDigits(f) {
+        f(987) && f(9876) && f(98765) && f(987654) && f(9876543) && f(98765432) && f(987654321);
+    }
+
     // Fibonnaci: apply successive Fibonnaci numbers to callback
     function fibonnaci(f) {
         var ab = [1, 1];
@@ -166,7 +174,9 @@ define(['lib/xdate'], function (XDate) {
     addGenerators(
         [
             unfold.repeat(digitAndZeros), unfold.scale(digitAndZeros), unfold.double(digitAndZeros),
-            unfold.repeat(digitRepeat)
+            unfold.repeat(digitRepeat),
+            unfold.repeat(increasingDigits),
+            unfold.repeat(decreasingDigits)
         ],
         [
             'Y', 'YM', 'YMW', 'YMWd', 'YMd',
@@ -209,27 +219,8 @@ define(['lib/xdate'], function (XDate) {
     );
 
 
-    //
-    // return [
-    //     function (f) {
-    //         [123, 1234, 12345, 123456, 1234567, 12345678, 123456789].forEach(f);
-    //     },
-    //     function (f) {
-    //         [987, 9876, 98765, 987654, 9876543, 98765432, 987654321].forEach(f)
-    //     },
-    //     function (f) {
-    //         [12321, 1234321, 123454321, 12345654321].forEach(f)
-    //     },
-    // ];
-    // 123, 123, 123
-    // 1234, 1234, 1234
-    // 12345, 12345, 12345
-
-    // 123, 321, 123, 321, ...
-    // 1234, 4321, 1234, 4321, ...
-
     // TODO: successive squares
-    // TODO: succesive primes
+    // TODO: successive primes
     // TODO: doubling increase
     // TODO: partition of the 10 digits
 
