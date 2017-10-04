@@ -1,199 +1,238 @@
 define(['lib/xdate'], function (XDate) {
 
-    var numberGenerators = function () {
 
-        // Single number driver: 1, 2, 3, ... 99, 100
-        function oneToHundred(f) {
-            var i = 1;
-            while (i <= 100 && f(i)) {
-                i++;
-            }
-        }
-
-        // Single number driver: 1, 2, ..., 9, 10, 20, ..., 90, 100, 200, ...
-        function digitAndZeros(f) {
-            var x = 1;
-            var b = 1;
-            while (f(x * b)) {
-                x++;
-                if (x >= 10) {
-                    x = 1;
-                    b *= 10;
-                }
-            }
-        }
-
-        // Single number driver: 111, 222, 333, ..., 999, 1111, 2222, ..., 9999, 11111, ....
-        function digitRepeat(f) {
-            var x = 1;
-            var b = 111;
-            while (f(x * b)) {
-                x++;
-                if (x >= 10) {
-                    x = 1;
-                    b = b * 10 + 1;
-                }
-            }
-        }
-
-
-        // Convert (n -> bool) callback driver to (n, n, n, n, n -> bool) callback driver
-        function repeat(driver) {
+    // Helpers to convert a "driver" function that takes a single argument callback function
+    // to a new driver function that takes a multiple argument callback function
+    // (where the arguments relate in a certain way).
+    var unfold = {
+        'repeat': function (driver) {
             return function (f) {
-                driver(function (n) { return f(n, n, n, n, n)});
+                driver(function (n) { return f(n, n, n, n, n, n, n); });
             }
-        }
-
-        // Convert (n -> bool) callback driver to (n, n+1, n+2, n+3, n+4 -> bool) callback driver
-        function increase(driver) {
+        },
+        'increase': function (driver) {
             return function (f) {
-                driver(function (n) { return f(n, n + 1, n + 2, n + 3, n + 4)});
+                driver(function (n) { return f(n, n + 1, n + 2, n + 3, n + 4, n + 5, n + 6); });
             }
-        }
-
-        // Convert (n -> bool) callback driver to (n+4, n+3, n+2, n+1, n -> bool) callback driver
-        function decrease(driver) {
+        },
+        'decrease': function (driver) {
             return function (f) {
-                driver(function (n) { return f(n + 4, n + 3, n + 2, n + 1, n)});
+                driver(function (n) { return f(n + 6, n + 5, n + 4, n + 3, n + 2, n + 1, n); });
             }
-        }
-
-        function scale(driver) {
+        },
+        'scale': function (driver) {
             return function (f) {
-                driver(function (n) { return f(n, n * 2, n * 3, n * 4, n * 5)});
+                driver(function (n) { return f(n, n * 2, n * 3, n * 4, n * 5, n * 6, n * 7); });
             }
-        }
+        },
 
-        function double(driver) {
+        'double': function (driver) {
             return function (f) {
-                driver(function (n) { return f(n, n * 2, n * 4, n * 8, n * 16)});
+                driver(function (n) { return f(n, n * 2, n * 4, n * 8, n * 16, n * 32, n * 64); });
             }
         }
+    };
 
-        // Fibonnaci: apply successive Fibonnaci numbers to callback
-        function fibonnaci(f) {
-            var ab = [1, 1];
-            ab.push(ab[0] + ab[1]);
-            ab.push(ab[1] + ab[2]);
+
+    // Single number driver: 1, 2, 3, ... 99, 100
+    function oneToHundred(f) {
+        var i = 1;
+        while (i <= 100 && f(i)) {
+            i++;
+        }
+    }
+
+    // Single number driver: 1, 2, 3, ...
+    function oneToInfinity(f) {
+        var i = 1;
+        while (f(i)) {
+            i++;
+        }
+    }
+
+    // Single number driver: 1, 2, ..., 9, 10, 20, ..., 90, 100, 200, ...
+    function digitAndZeros(f) {
+        var x = 1;
+        var b = 1;
+        while (f(x * b)) {
+            x++;
+            if (x >= 10) {
+                x = 1;
+                b *= 10;
+            }
+        }
+    }
+
+    // Single number driver: 111, 222, 333, ..., 999, 1111, 2222, ..., 9999, 11111, ....
+    function digitRepeat(f) {
+        var x = 1;
+        var b = 111;
+        while (f(x * b)) {
+            x++;
+            if (x >= 10) {
+                x = 1;
+                b = b * 10 + 1;
+            }
+        }
+    }
+
+    // Fibonnaci: apply successive Fibonnaci numbers to callback
+    function fibonnaci(f) {
+        var ab = [1, 1];
+        ab.push(ab[0] + ab[1]);
+        ab.push(ab[1] + ab[2]);
+        ab.push(ab[2] + ab[3]);
+
+        while (f.apply(null, ab)) {
+            ab.shift();
             ab.push(ab[2] + ab[3]);
+        }
+    }
 
-            while (f.apply(null, ab)) {
-                ab.shift();
-                ab.push(ab[2] + ab[3]);
-            }
+    // Build number sequences from a fixed digit sequence
+    // e.g. pi: 3,14159265  ->  ... [31, 41, 592, 6, 5] ... [3, 14, 159, 26, 5] ...
+    function fromDigits(digits) {
+        // Implementation: recursively based on a state array that keeps track of the length (in digits)
+        // of each number in the sequence.
+
+        /// Convert state array to numbers using the digits
+        function stateToNumbers(state) {
+            // Convert state to slices.
+            var slices = state.reduce(function (a, v, i) {
+                return a.concat(i < 1 ? [[0, v]] : [[a[a.length - 1][1], a[a.length - 1][1] + v]]);
+            }, []);
+            // Slice digit array and turn into numbers
+            var numbers = slices.map(function (v) {
+                return digits.slice.apply(digits, v).reduce(function (a, v) { return a * 10 + v;}, 0);
+            });
+            return numbers;
         }
 
-        // Build number sequences from a fixed digit sequence
-        // e.g. pi: 3,14159265  ->  ... [31, 41, 592, 6, 5] ... [3, 14, 159, 26, 5] ...
-        function fromDigits(digits) {
-            // Implementation: recursively based on a state array that keeps track of the length (in digits)
-            // of each number in the sequence.
+        /// Copy state and increment at given index
+        function incr(state, i) {
+            state = state.slice();
+            state[i] += 1;
+            return state
+        }
 
-            /// Convert state array to numbers using the digits
-            function stateToNumbers(state) {
-                // Convert state to slices.
-                var slices = state.reduce(function (a, v, i) {
-                    return a.concat(i < 1 ? [[0, v]] : [[a[a.length - 1][1], a[a.length - 1][1] + v]]);
-                }, []);
-                // Slice digit array and turn into numbers
-                var numbers = slices.map(function (v) {
-                    return digits.slice.apply(digits, v).reduce(function (a, v) { return a * 10 + v;}, 0);
-                });
-                return numbers;
-            }
-
-            /// Copy state and increment at given index
-            function incr(state, i) {
-                state = state.slice();
-                state[i] += 1;
-                return state
-            }
-
-            return function (f) {
-                // TODO: make sure all numbers (or at least 4) are consumed
-                /// Apply state and recursively evaluate higher states
-                function recurse(state, start_index) {
-                    var numbers = stateToNumbers(state);
-                    var total = state.reduce(function (a, v) {return a + v;}, 0);
-                    // TODO: limit the difference in state values
-                    // Try the numbers: if it works and there is room to grow: try larger digit groups recursively
-                    if (f.apply(null, numbers) && total < digits.length) {
-                        for (var i = start_index; i <= 4; i++) {
-                            recurse(incr(state, i), i);
-                        }
+        return function (f) {
+            // TODO: make sure all numbers (or at least 4) are consumed
+            /// Apply state and recursively evaluate higher states
+            function recurse(state, start_index) {
+                var numbers = stateToNumbers(state);
+                var total = state.reduce(function (a, v) {return a + v;}, 0);
+                // TODO: limit the difference in state values
+                // Try the numbers: if it works and there is room to grow: try larger digit groups recursively
+                if (f.apply(null, numbers) && total < digits.length) {
+                    for (var i = start_index; i <= 4; i++) {
+                        recurse(incr(state, i), i);
                     }
                 }
+            }
 
-                recurse([1, 1, 1, 1, 1], 0);
-            };
-        }
+            recurse([1, 1, 1, 1, 1, 1, 1], 0);
+        };
+    }
+
+    var generators = [];
+
+    function addGenerators(drivers, codes) {
+        drivers.forEach(function (driver) {
+            generators.push([driver, codes]);
+        });
+    }
 
 
-        // 123, 123, 123
-        // 1234, 1234, 1234
-        // 12345, 12345, 12345
+    // Regular birthdays
+    addGenerators(
+        [unfold.repeat(oneToHundred)],
+        ['Y']
+    );
 
-        // 123, 321, 123, 321, ...
-        // 1234, 4321, 1234, 4321, ...
+    // Normal integers (from 1 to infinity): at least 4 date parts required
+    addGenerators(
+        [
+            unfold.repeat(oneToInfinity), unfold.increase(oneToHundred), unfold.decrease(oneToHundred),
+            unfold.scale(oneToHundred), unfold.double(oneToHundred)
+        ],
+        [
+            'DYMW', 'DYMWd', 'DYMd',
+            'YMWdh', 'YMdh',
+            'MWdh'
+        ]
+    );
 
-        // 12, 34, 56, 78
-        // 123, 456, 789
-        // 1, 23, 345
-        function oneTwoThree(f) {
-            f()
-        }
+    // Special single numbers
+    addGenerators(
+        [
+            unfold.repeat(digitAndZeros), unfold.scale(digitAndZeros), unfold.double(digitAndZeros),
+            unfold.repeat(digitRepeat)
+        ],
+        [
+            'Y', 'YM', 'YMW', 'YMWd', 'YMd',
+            'M', 'MW', 'MWd', 'Md',
+            'W', 'Wd', 'Wdh',
+            'd', 'dh', 'dhm',
+            'h', 'm', 's'
+        ]
+    );
 
-        return [
-            // 'repeated one to hundred':
-            repeat(oneToHundred),
-            // 'one to hundred incrementing':
-            // TODO require that at least 3 values are used
-            increase(oneToHundred),
-            // 'one to hundred decrementing':
-            decrease(oneToHundred),
-            scale(oneToHundred),
-            double(oneToHundred),
-            // 'digit and zeros':
-            repeat(digitAndZeros),
-            scale(digitAndZeros),
-            double(digitAndZeros),
-            // 'digit repeated':
-            repeat(digitRepeat),
-            // 'fibonnaci':
-            // fibonnaci,
+    // Fibonnaci
+    addGenerators(
+        [fibonnaci],
+        ['DYMW', 'DYMWd', 'DYMWdh']
+    );
 
-            // TODO: label number sequences for ui?
-            fromDigits([3, 1, 4, 1, 5, 9, 2, 6, 5, 3]),  // From digits of pi
-
+    // Pi and other digits
+    addGenerators(
+        [
+            // Pi
+            fromDigits([3, 1, 4, 1, 5, 9, 2, 6, 5, 3]),
+            // Ascending and descending numbers
             fromDigits([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]),
-            fromDigits([9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
-        ];
+            fromDigits([9, 8, 7, 6, 5, 4, 3, 2, 1, 0]),
+        ],
+        [
+            'DYMW', 'DYMWd', 'DYMWdh', 'DYMWdhm',
+            'YMWd', 'YMWdh', 'YMWdhm',
+            'MWdh', 'MWdhm'
+        ]
+    );
 
-        //
-        // return [
-        //     function (f) {
-        //         [123, 1234, 12345, 123456, 1234567, 12345678, 123456789].forEach(f);
-        //     },
-        //     function (f) {
-        //         [987, 9876, 98765, 987654, 9876543, 98765432, 987654321].forEach(f)
-        //     },
-        //     function (f) {
-        //         [12321, 1234321, 123454321, 12345654321].forEach(f)
-        //     },
-        // ];
-        // 123, 123, 123
-        // 1234, 1234, 1234
-        // 12345, 12345, 12345
+    addGenerators(
+        [1, 2, 3, 4, 5, 6, 7, 8, 9].map(function (i) {
+            return fromDigits([i, i, i, i, i, i, i, i, i, i]);
+        }),
+        [
+            'DYMWdh', 'YMWdh'
+        ]
+    );
 
-        // 123, 321, 123, 321, ...
-        // 1234, 4321, 1234, 4321, ...
 
-        // TODO: successive squares
-        // TODO: succesive primes
-        // TODO: doubling increase
-        // TODO: partition of the 10 digits
+    //
+    // return [
+    //     function (f) {
+    //         [123, 1234, 12345, 123456, 1234567, 12345678, 123456789].forEach(f);
+    //     },
+    //     function (f) {
+    //         [987, 9876, 98765, 987654, 9876543, 98765432, 987654321].forEach(f)
+    //     },
+    //     function (f) {
+    //         [12321, 1234321, 123454321, 12345654321].forEach(f)
+    //     },
+    // ];
+    // 123, 123, 123
+    // 1234, 1234, 1234
+    // 12345, 12345, 12345
 
-    }();
+    // 123, 321, 123, 321, ...
+    // 1234, 4321, 1234, 4321, ...
+
+    // TODO: successive squares
+    // TODO: succesive primes
+    // TODO: doubling increase
+    // TODO: partition of the 10 digits
+
 
     function buildDateConvertor(birthDate, code) {
         return function convertor() {
@@ -203,12 +242,14 @@ define(['lib/xdate'], function (XDate) {
             var nameParts = [];
 
             [
-                [/c/, 'decade', function(x) {return date.addYears(10*x);}],
-                [/y/, 'year', date.addYears],
-                [/m/, 'month', date.addMonths],
-                [/w/, 'week', function (x) { return date.addDays(7 * x);}],
+                [/D/, 'decade', function (x) {return date.addYears(10 * x);}],
+                [/Y/, 'year', date.addYears],
+                [/M/, 'month', date.addMonths],
+                [/W/, 'week', function (x) { return date.addDays(7 * x);}],
                 [/d/, 'day', date.addDays],
-                [/h/, 'hour', date.addHours]
+                [/h/, 'hour', date.addHours],
+                [/m/, 'minute', date.addMinutes],
+                [/s/, 'second', date.addSeconds]
             ].forEach(function (period) {
                 // period[0]: regex
                 // period[1]: period name
@@ -242,24 +283,15 @@ define(['lib/xdate'], function (XDate) {
     function collect(birthDate, fromDate, toDate) {
         var dates = {};
 
-        // TODO: guard against too low/high dates
+        generators.forEach(function (generator) {
+            var driver = generator[0];
+            var dateCodes = generator[1];
+            dateCodes.forEach(function (dateCode) {
+                var dateConvertor = buildDateConvertor(birthDate, dateCode);
 
-        var dateConvertors = [
-            'c', 'cy', 'cym', 'cymw', 'cymwd',
-            'y', 'ym', 'ymw', 'ymwd', 'ymwdh',
-            'ymd', 'ymdh',
-            'm', 'mw', 'mwd', 'mwdh',
-            'md', 'mdh',
-            'w', 'wd', 'wdh',
-            'd', 'dh'
-        ].map(function (code) {
-            return buildDateConvertor(birthDate, code);
-        });
-
-        dateConvertors.forEach(function (dateConvertor) {
-            numberGenerators.forEach(function (numberGenerator) {
                 // Call number generator with callback that collects relevant dates.
-                numberGenerator(function collect() {
+                driver(function collect() {
+                    // TODO: guard against too low/high dates?
                     var result = dateConvertor.apply(null, arguments);
                     if (result[1] > toDate) {
                         // Abort this number driver
@@ -270,8 +302,11 @@ define(['lib/xdate'], function (XDate) {
                     }
                     return true;
                 });
-            });
+
+
+            })
         });
+
 
         return dates;
     }

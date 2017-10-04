@@ -53,8 +53,8 @@ define(['lib/d3', 'lib/xdate', 'app/generator'], function (d3, XDate, generator)
     }
 
     function showDates(birthDay) {
-        var fromDate = new XDate().addMonths(-1);
-        var toDate = new XDate().addMonths(3);
+        var fromDate = new XDate().addDays(-7);
+        var toDate = new XDate().addMonths(6);
 
         var dates = generator.collect(birthDay, fromDate, toDate);
 
