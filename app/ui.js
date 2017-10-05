@@ -106,7 +106,6 @@ define(['lib/d3', 'lib/xdate', 'app/generator'], function (d3, XDate, generator)
             .append('div')
             .merge(days)
             .attr('class', function (d) {
-                console.log([d, now]);
                 return d[1].toString('yyyy-MM-dd') === today ? 'birthday birthday-today'
                     : (d[1] < now ? 'birthday birthday-past' : 'birthday birthday-future');
             })

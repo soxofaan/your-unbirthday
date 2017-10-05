@@ -129,7 +129,6 @@ define(['lib/xdate'], function (XDate) {
         }
 
         return function (f) {
-            // TODO: make sure all numbers (or at least 4) are consumed
             /// Apply state and recursively evaluate higher states
             function recurse(state, start_index) {
                 var numbers = stateToNumbers(state);
@@ -162,14 +161,14 @@ define(['lib/xdate'], function (XDate) {
         ['Y']
     );
 
-    // Normal integers (from 1 to infinity): at least 4 date parts required
+    // Normal integers (from 1 to infinity): needs enough date parts
     addGenerators(
         [
             unfold.repeat(oneToInfinity), unfold.increase(oneToHundred), unfold.decrease(oneToHundred),
             unfold.scale(oneToHundred), unfold.double(oneToHundred)
         ],
         [
-            'DYMW', 'DYMWd', 'DYMd',
+            'DYMWdh', 'DYMdh',
             'YMWdh', 'YMdh',
             'MWdh'
         ]
@@ -211,9 +210,7 @@ define(['lib/xdate'], function (XDate) {
             fromDigits([9, 8, 7, 6, 5, 4, 3, 2, 1, 0]),
         ],
         [
-            'DYMW', 'DYMWd', 'DYMWdh', 'DYMWdhm',
-            'YMWd', 'YMWdh', 'YMWdhm',
-            'MWdh', 'MWdhm'
+            'DYMWdhm', 'YMWdhm', 'MWdhm'
         ]
     );
 
