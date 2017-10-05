@@ -97,6 +97,11 @@ define(['lib/xdate'], function (XDate) {
         }
     }
 
+    function squares(f) {
+        for (var i = 1; f(i * i, (i + 1) * (i + 1), (i + 2) * (i + 2), (i + 3) * (i + 3), (i + 4) * (i + 4), (i + 5) * (i + 5), (i + 6) * (i + 6)); i++) {
+        }
+    }
+
     // Build number sequences from a fixed digit sequence
     // e.g. pi: 3,14159265  ->  ... [31, 41, 592, 6, 5] ... [3, 14, 159, 26, 5] ...
     function fromDigits(digits) {
@@ -189,8 +194,11 @@ define(['lib/xdate'], function (XDate) {
 
     // Fibonnaci
     addGenerators(
-        [fibonnaci],
-        ['DYMW', 'DYMWd', 'DYMWdh']
+        [fibonnaci, squares],
+        [
+            'DYMWd', 'DYMWdh', 'DYMd', 'DYMdh',
+            'YMWd', 'YMWdh', 'YMdh'
+        ]
     );
 
     // Pi and other digits
@@ -219,9 +227,7 @@ define(['lib/xdate'], function (XDate) {
     );
 
 
-    // TODO: successive squares
     // TODO: successive primes
-    // TODO: doubling increase
     // TODO: partition of the 10 digits
 
 
