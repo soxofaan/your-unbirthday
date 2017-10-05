@@ -53,6 +53,8 @@ define(['lib/d3', 'lib/xdate', 'app/generator'], function (d3, XDate, generator)
     }
 
     function showDates(birthDay) {
+        var now = new XDate();
+        var today = now.toString('yyyy-MM-dd');
         var fromDate = new XDate().addDays(-7);
         var toDate = new XDate().addMonths(6);
 
@@ -102,8 +104,12 @@ define(['lib/d3', 'lib/xdate', 'app/generator'], function (d3, XDate, generator)
 
         days.enter()
             .append('div')
-            .attr('class', 'birthday')
             .merge(days)
+            .attr('class', function (d) {
+                console.log([d, now]);
+                return d[1].toString('yyyy-MM-dd') === today ? 'birthday birthday-today'
+                    : (d[1] < now ? 'birthday birthday-past' : 'birthday birthday-future');
+            })
             .html(function (d) {
                 return (
                     '<div class="date"><span class="weekday">' + d[1].toString('ddd') + '</span> '

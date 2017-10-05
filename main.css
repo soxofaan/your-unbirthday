@@ -106,6 +106,15 @@ div#calendar {
     vertical-align: top;
 }
 
+.birthday.birthday-past .description {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.birthday.birthday-today .description {
+    font-weight: bold;
+}
+
 @media only screen and (max-width: 800px) {
 
     div#calendar {
