@@ -4,17 +4,27 @@ body {
     font-size: 16px;
     line-height: 1.5;
     color: #2b505b;
-    font-family: 'Alegreya', serif;
+    font-family: 'Roboto', sans-serif;
+}
+
+#title {
+    text-align: center;
+    margin: 30px 0;
 }
 
 h1 {
-    font-size: 48px;
+    font-size: 60px;
     text-align: center;
+    margin: 0;
+}
+
+#title small {
+  font-size: 50%;
 }
 
 #date-select {
     text-align: center;
-    margin: 20px;
+    margin: 30px 0;
     font-size: 24px;
 }
 
@@ -29,7 +39,7 @@ h1 {
 
 div#calendar {
     width: 800px;
-    margin: 0 auto;
+    margin: 30px auto;
 }
 
 .month-section {
@@ -43,6 +53,7 @@ div#calendar {
     display: inline-block;
     vertical-align: top;
     text-align: right;
+    font-family: 'Alegreya', serif;
 }
 
 .month-label .month {
@@ -81,6 +92,7 @@ div#calendar {
     letter-spacing: .2em;
     width: 5em;
     vertical-align: middle;
+    font-family: 'Alegreya', serif;
 }
 
 .birthday .day {
