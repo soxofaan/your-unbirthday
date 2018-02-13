@@ -1,5 +1,9 @@
 define(['lib/xdate'], function (XDate) {
 
+    // Maximum number of arguments for date convertors.
+    var ARGSMAX = 8;
+
+    var range8 = [0, 1, 2, 3, 4, 5, 6, 7];
 
     // Helpers to convert a "driver" function that takes a single argument callback function
     // to a new driver function that takes a multiple argument callback function
@@ -7,28 +11,28 @@ define(['lib/xdate'], function (XDate) {
     var unfold = {
         'repeat': function (driver) {
             return function (f) {
-                driver(function (n) { return f(n, n, n, n, n, n, n); });
+                driver(function (n) { return f(n, n, n, n, n, n, n, n); });
             }
         },
         'increase': function (driver) {
             return function (f) {
-                driver(function (n) { return f(n, n + 1, n + 2, n + 3, n + 4, n + 5, n + 6); });
+                driver(function (n) { return f(n, n + 1, n + 2, n + 3, n + 4, n + 5, n + 6, n + 7); });
             }
         },
         'decrease': function (driver) {
             return function (f) {
-                driver(function (n) { return f(n + 6, n + 5, n + 4, n + 3, n + 2, n + 1, n); });
+                driver(function (n) { return f(n + 7, n + 6, n + 5, n + 4, n + 3, n + 2, n + 1, n); });
             }
         },
         'scale': function (driver) {
             return function (f) {
-                driver(function (n) { return f(n, n * 2, n * 3, n * 4, n * 5, n * 6, n * 7); });
+                driver(function (n) { return f(n, n * 2, n * 3, n * 4, n * 5, n * 6, n * 7, n * 8); });
             }
         },
 
         'double': function (driver) {
             return function (f) {
-                driver(function (n) { return f(n, n * 2, n * 4, n * 8, n * 16, n * 32, n * 64); });
+                driver(function (n) { return f(n, n * 2, n * 4, n * 8, n * 16, n * 32, n * 64, n * 128); });
             }
         }
     };
@@ -87,9 +91,9 @@ define(['lib/xdate'], function (XDate) {
     // Fibonnaci: apply successive Fibonnaci numbers to callback
     function fibonnaci(f) {
         var ab = [1, 1];
-        ab.push(ab[0] + ab[1]);
-        ab.push(ab[1] + ab[2]);
-        ab.push(ab[2] + ab[3]);
+        while (ab.length < ARGSMAX) {
+            ab.push(ab[ab.length - 2] + ab[ab.length - 1]);
+        }
 
         while (f.apply(null, ab)) {
             ab.shift();
@@ -98,8 +102,13 @@ define(['lib/xdate'], function (XDate) {
     }
 
     function squares(f) {
-        for (var i = 1; f(i * i, (i + 1) * (i + 1), (i + 2) * (i + 2), (i + 3) * (i + 3), (i + 4) * (i + 4), (i + 5) * (i + 5), (i + 6) * (i + 6)); i++) {
+        for (
+            var i = 1;
+            f.apply(null, range8.map(function (x) { return (i + x) * (i + x); }));
+            i++
+        ) {
         }
+
     }
 
     // Build number sequences from a fixed digit sequence
