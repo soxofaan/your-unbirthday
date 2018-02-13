@@ -123,7 +123,7 @@ define(['lib/d3', 'lib/xdate', 'app/generator'], function (d3, XDate, generator)
 
     function setup() {
         // Get initial date from URL fragment.
-        var initialDate = new Date(window.location.hash);
+        var initialDate = new Date(window.location.hash.substring(1));
         if (isNaN(initialDate.getTime())) {
             setupForm((new XDate()).addYears(-42));
         }
