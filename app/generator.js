@@ -173,16 +173,17 @@ define(['lib/xdate'], function (XDate) {
         ['Y']
     );
 
-    // Normal integers (from 1 to infinity): needs enough date parts
+    // Normal integers (from 1 to infinity): needs high number of date parts to be interesting.
     addGenerators(
         [
-            unfold.repeat(oneToInfinity), unfold.increase(oneToHundred), unfold.decrease(oneToHundred),
+            unfold.repeat(oneToInfinity),
+            unfold.increase(oneToHundred), unfold.decrease(oneToHundred),
             unfold.scale(oneToHundred), unfold.double(oneToHundred)
         ],
         [
             'DYMWdh', 'DYMdh',
-            'YMWdh', 'YMdh',
-            'MWdh'
+            'YMWdhm', 'YMdhm',
+            'MWdhm'
         ]
     );
 
