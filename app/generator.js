@@ -113,9 +113,12 @@ define(['lib/xdate'], function (XDate) {
 
     // Build number sequences from a fixed digit sequence
     // e.g. pi: 3,14159265  ->  ... [31, 41, 592, 6, 5] ... [3, 14, 159, 26, 5] ...
-    function fromDigits(digits) {
+    function fromDigits(digits, stateSize) {
         // Implementation: recursively based on a state array that keeps track of the length (in digits)
         // of each number in the sequence.
+
+        // Starting state: sequence of ones: [1, 1, 1, ..., 1, 1]
+        var startState = Array(stateSize || ARGSMAX).fill(1);
 
         /// Convert state array to numbers using the digits
         function stateToNumbers(state) {
@@ -144,14 +147,14 @@ define(['lib/xdate'], function (XDate) {
                 var total = state.reduce(function (a, v) {return a + v;}, 0);
                 // TODO: limit the difference in state values
                 // Try the numbers: if it works and there is room to grow: try larger digit groups recursively
-                if (f.apply(null, numbers) && total < digits.length) {
-                    for (var i = start_index; i <= 4; i++) {
+                if (total < digits.length && f.apply(null, numbers)) {
+                    for (var i = start_index; i < stateSize; i++) {
                         recurse(incr(state, i), i);
                     }
                 }
             }
 
-            recurse([1, 1, 1, 1, 1, 1, 1], 0);
+            recurse(startState, 0);
         };
     }
 
@@ -209,32 +212,35 @@ define(['lib/xdate'], function (XDate) {
         ]
     );
 
-    // Pi and other digits
-    addGenerators(
-        [
-            // Pi
-            fromDigits([3, 1, 4, 1, 5, 9, 2, 6, 5, 3]),
-            // Ascending and descending numbers
-            fromDigits([1, 2, 3, 4, 5, 6, 7, 8, 9, 0]),
-            fromDigits([9, 8, 7, 6, 5, 4, 3, 2, 1, 0]),
-        ],
-        [
-            'DYMWdhm', 'YMWdhm', 'MWdhm'
-        ]
-    );
-
-    addGenerators(
-        [1, 2, 3, 4, 5, 6, 7, 8, 9].map(function (i) {
-            return fromDigits([i, i, i, i, i, i, i, i, i, i]);
-        }),
-        [
-            'DYMWdh', 'YMWdh'
-        ]
-    );
+    // Digit sequence partitions
+    [
+        'DYMWdh', 'DYMdh',
+        'YMWdh', 'YMdh',
+        'MWdh'
+    ].forEach(function (code) {
+        var stateSize = code.length;
+        addGenerators(
+            [
+                // Pi
+                fromDigits([3, 1, 4, 1, 5, 9, 2, 6, 5, 3], stateSize),
+                // Ascending and descending numbers
+                fromDigits([1, 2, 3, 4, 5, 6, 7, 8, 9, 0], stateSize),
+                fromDigits([9, 8, 7, 6, 5, 4, 3, 2, 1, 0], stateSize)
+            ],
+            [code]
+        );
+        // Repeated digit chunks
+        addGenerators(
+            [1, 2, 3, 4, 5, 6, 7, 8, 9].map(function (i) {
+                return fromDigits([i, i, i, i, i, i, i, i, i, i, i], stateSize);
+            }),
+            [code]
+        );
+    });
 
 
     // TODO: successive primes
-    // TODO: partition of the 10 digits
+    // TODO: 1-11-111-1111, 2-22-222-2222, ....
 
 
     function buildDateConvertor(birthDate, code) {
