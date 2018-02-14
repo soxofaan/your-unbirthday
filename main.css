@@ -4,13 +4,13 @@ body {
     font-size: 16px;
     line-height: 1.5;
     color: #2b505b;
-    font-family: 'Roboto', sans-serif;
 }
 
 #title {
     text-align: center;
     margin: 30px 0;
     line-height: 0.9;
+    font-family: 'Caveat', cursive;
 }
 
 h1 {
@@ -20,13 +20,14 @@ h1 {
 }
 
 #title small {
-  font-size: 50%;
+    font-size: 50%;
 }
 
 #date-select {
     text-align: center;
     margin: 30px 0;
     font-size: 24px;
+    font-family: 'Oswald', sans-serif;
 }
 
 #date-form select {
