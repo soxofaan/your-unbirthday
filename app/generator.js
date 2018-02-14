@@ -215,8 +215,10 @@ define(['lib/xdate'], function (XDate) {
 
     // Digit sequence partitions
     [
-        'DYMWdh', 'DYMdh',
-        'YMWdh', 'YMdh',
+        'DMWdh',
+        'DMdh',
+        'YMWdh',
+        'YMdh',
         'MWdh'
     ].forEach(function (code) {
         var stateSize = code.length;
@@ -230,7 +232,16 @@ define(['lib/xdate'], function (XDate) {
             ],
             [code]
         );
-        // Repeated digit chunks
+    });
+
+
+    // Repeated digit chunks (avoid decade and hour usage here)
+    [
+        'YMWd',
+        'YMd',
+        'MWd'
+    ].forEach(function (code) {
+        var stateSize = code.length;
         addGenerators(
             [1, 2, 3, 4, 5, 6, 7, 8, 9].map(function (i) {
                 return fromDigits([i, i, i, i, i, i, i, i, i, i, i], stateSize);
