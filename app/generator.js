@@ -255,16 +255,16 @@ define(['lib/xdate'], function (XDate) {
     });
 
 
-    // Repeated digit chunks (avoid decade and hour usage here)
+    // Repeated digit chunks (avoid decade usage here)
     [
-        'YMWd',
+        'YMWd', 'YMWdh',
         'YMd',
         'MWd'
     ].forEach(function (code) {
         var stateSize = code.length;
         addGenerators(
             [1, 2, 3, 4, 5, 6, 7, 8, 9].map(function (i) {
-                return fromDigits([i, i, i, i, i, i, i, i, i, i, i], stateSize);
+                return fromDigits([i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i, i], stateSize);
             }),
             [code]
         );
