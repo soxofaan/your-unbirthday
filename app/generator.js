@@ -108,7 +108,27 @@ define(['lib/xdate'], function (XDate) {
             i++
         ) {
         }
+    }
 
+    // Paired mirror numbers: [123, 321, 123, 321], ..., [456, 654, 456, 654], ...
+    function mirrorNumbers(f) {
+        function mirror(x) {
+            var y = 0;
+            while (x) {
+                y = y * 10 + (x % 10);
+                x = Math.floor(x / 10);
+            }
+            return y
+        }
+
+        [
+            123, 234, 345, 456, 567, 678, 789,
+            1234, 2345, 3456, 4567, 5678, 6789
+        ].forEach(function (x) {
+            var y = mirror(x);
+            f(x, y, x, y);
+            f(y, x, y, x);
+        })
     }
 
     // Build number sequences from a fixed digit sequence
@@ -250,6 +270,16 @@ define(['lib/xdate'], function (XDate) {
         );
     });
 
+    // Mirrored numbers in pairs
+    addGenerators(
+        [mirrorNumbers],
+        [
+            'MWdh', 'MW', 'Mdhm', 'Md', 'Mhms', 'Mh',
+            'Wdhm', 'Wd', 'Whms', 'Wh',
+            'dhms', 'dh',
+            'hm'
+        ]
+    );
 
     // TODO: successive primes
     // TODO: 1-11-111-1111, 2-22-222-2222, ....
