@@ -4,6 +4,7 @@ body {
     font-size: 16px;
     line-height: 1.5;
     color: #2b505b;
+    font-family: sans-serif;
 }
 
 #title {
@@ -42,6 +43,7 @@ h1 {
 div#calendar {
     width: 800px;
     margin: 30px auto;
+    min-height: 80vh;
 }
 
 .month-section {
@@ -127,6 +129,16 @@ div#calendar {
 
 .birthday.birthday-today .description {
     font-weight: bold;
+}
+
+div#footer {
+    text-align: center;
+    font-size: 70%;
+    color: #9aa8ab;
+}
+
+div#footer a {
+    color: #9aa8ab;
 }
 
 @media only screen and (max-width: 800px) {
