@@ -56,7 +56,7 @@ define(['lib/d3', 'lib/xdate', 'app/generator'], function (d3, XDate, generator)
         var now = new XDate();
         var today = now.toString('yyyy-MM-dd');
         var fromDate = new XDate().addDays(-7);
-        var toDate = new XDate().addMonths(6);
+        var toDate = new XDate().addMonths(12);
 
         var dates = generator.collect(birthDay, fromDate, toDate);
 
