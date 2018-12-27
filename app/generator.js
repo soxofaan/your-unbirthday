@@ -294,6 +294,7 @@ define(['lib/xdate'], function (XDate) {
             [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function (j) {
                 if (i != j) {
                     drivers.push(fromDigits([i, j, i, j, i, j, i, j, i, j, i, j, i, j, i, j, i, j, i, j, i, j], stateSize, 2));
+                    drivers.push(fromDigits([i, j, j, i, i, j, j, i, i, j, j, i, i, j, j, i, i, j, j, i, i, j], stateSize, 2));
                 }
             });
         });
