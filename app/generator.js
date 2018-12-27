@@ -5,6 +5,15 @@ define(['lib/xdate'], function (XDate) {
 
     var range8 = [0, 1, 2, 3, 4, 5, 6, 7];
 
+    // A "driver" is a function that takes a single callback argument `f`,
+    // which takes one or multiple numerical arguments and returns a boolean.
+    // The driver should call the callback `f` successively with a set of numbers
+    // following a particular pattern. For example: call `f(1, 2, 3)`, call `f(2, 3, 4)`,
+    // call `f(3, 4, 5)` et cetera. The driver should check the return value of these callback
+    // calls and stop once a falsy value is returned.
+    // This allows the driver to implement an infinite sequence while delegating the termination condition to the callback.
+
+
     // Helpers to convert a "driver" function that takes a single argument callback function
     // to a new driver function that takes a multiple argument callback function
     // (where the arguments relate in a certain way).
@@ -133,12 +142,15 @@ define(['lib/xdate'], function (XDate) {
 
     // Build number sequences from a fixed digit sequence
     // e.g. pi: 3,14159265  ->  ... [31, 41, 592, 6, 5] ... [3, 14, 159, 26, 5] ...
-    function fromDigits(digits, stateSize) {
+    function fromDigits(digits, stateSize, chunkSize) {
         // Implementation: recursively based on a state array that keeps track of the length (in digits)
         // of each number in the sequence.
 
+        chunkSize = chunkSize || 1;
+
         // Starting state: sequence of ones: [1, 1, 1, ..., 1, 1]
-        var startState = Array(stateSize || ARGSMAX).fill(1);
+        var startState = Array(stateSize || ARGSMAX).fill(chunkSize);
+
 
         /// Convert state array to numbers using the digits
         function stateToNumbers(state) {
@@ -156,7 +168,7 @@ define(['lib/xdate'], function (XDate) {
         /// Copy state and increment at given index
         function incr(state, i) {
             state = state.slice();
-            state[i] += 1;
+            state[i] += chunkSize;
             return state
         }
 
@@ -178,6 +190,7 @@ define(['lib/xdate'], function (XDate) {
         };
     }
 
+    // Sequence of (driver, datecodes) pairs
     var generators = [];
 
     function addGenerators(drivers, codes) {
@@ -270,6 +283,23 @@ define(['lib/xdate'], function (XDate) {
         );
     });
 
+    // Repeated digit pairs
+    [
+        'YMWdh',
+        'MWdh'
+    ].forEach(function (code) {
+        var stateSize = code.length;
+        var drivers = [];
+        [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function (i) {
+            [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function (j) {
+                if (i != j) {
+                    drivers.push(fromDigits([i, j, i, j, i, j, i, j, i, j, i, j, i, j, i, j, i, j, i, j, i, j], stateSize, 2));
+                }
+            });
+        });
+        addGenerators(drivers, [code]);
+    });
+
     // Mirrored numbers in pairs
     addGenerators(
         [mirrorNumbers],
@@ -285,6 +315,7 @@ define(['lib/xdate'], function (XDate) {
     // TODO: 1-11-111-1111, 2-22-222-2222, ....
 
 
+    // Factory to build a function that takes multiple numbers as arguments and returns a date.
     function buildDateConvertor(birthDate, code) {
         return function convertor() {
             var args = arguments;
@@ -349,6 +380,7 @@ define(['lib/xdate'], function (XDate) {
                         return false;
                     }
                     if (result[1] > fromDate) {
+                        // TODO: skip/merge cases with long common prefix on same date
                         dates[result[0]] = result[1];
                     }
                     return true;
